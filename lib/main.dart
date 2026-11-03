@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'assets_media.dart';
-import 'detail_page.dart';
+import 'api_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,19 +13,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Assets Media & Navigation',
-
-      theme: ThemeData(
-        useMaterial3: true,
-        fontFamily: 'Poppins',
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4D63D9)),
-      ),
-
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const AssetsMediaPage(),
-        '/detail': (context) => const DetailPage(),
-      },
+      title: 'REST API Praktikum',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const ApiPage(),
     );
   }
 }
