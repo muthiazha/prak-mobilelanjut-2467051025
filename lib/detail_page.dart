@@ -1,11 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
-class DetailPage extends StatelessWidget {
+class DetailPage extends StatefulWidget {
   const DetailPage({super.key});
 
   @override
+  State<DetailPage> createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+  late VideoPlayerController _controller;
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset('assets/videos/blue.mp4')
+      ..initialize().then((_) {
+        setState(() {
+          _isInitialized = true;
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Menangkap Route Arguments
     final args = ModalRoute.of(context)?.settings.arguments as String?;
 
     return Scaffold(
@@ -17,11 +42,39 @@ class DetailPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.play_circle_fill,
-              size: 100,
-              color: Color(0xFF4D63D9),
-            ),
+            _isInitialized
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 400),
+                          child: AspectRatio(
+                            aspectRatio: _controller.value.aspectRatio,
+                            child: VideoPlayer(_controller),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _controller.value.isPlaying
+                                ? _controller.pause()
+                                : _controller.play();
+                          });
+                        },
+                        icon: Icon(
+                          _controller.value.isPlaying
+                              ? Icons.pause_circle_filled
+                              : Icons.play_circle_fill,
+                          size: 60,
+                          color: const Color(0xFF4D63D9),
+                        ),
+                      ),
+                    ],
+                  )
+                : const CircularProgressIndicator(),
             const SizedBox(height: 20),
             Text(
               args ?? 'Ini adalah halaman Video',
@@ -29,11 +82,9 @@ class DetailPage extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
-
-            // Menggunakan Navigator.pop untuk kembali
             ElevatedButton.icon(
               onPressed: () {
-                Navigator.pop(context); // Kembali ke halaman sebelumnya
+                Navigator.pop(context);
               },
               icon: const Icon(Icons.arrow_back),
               label: const Text('Kembali'),
